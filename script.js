@@ -1,15 +1,18 @@
 //You can edit ALL of the code here
-function setup() {
-  const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
-}
+// function setup() {
+//   const allEpisodes = getAllEpisodes();
+//   makePageForEpisodes(allEpisodes);
+// }
 
-function makePageForEpisodes(episodeList) {
-  const rootElem = document.getElementById("root");
-  // rootElem.textContent = `Got ${episodeList.length} episode(s)`;
-}
+// function makePageForEpisodes(episodeList) {
+//   const rootElem = document.getElementById("root");
+//   // rootElem.textContent = `Got ${episodeList.length} episode(s)`;
+// }
 
-window.onload = setup;
+// window.onload = setup;
+
+const url = "https://api.tvmaze.com/shows/82/episodes";
+let allEpisodes = [];
 
 function getEpisodeName(singleEpisode) {
   return `${singleEpisode.name} - ${
@@ -42,15 +45,26 @@ function displayEpisode(singleEpisode) {
   article.className = "episode";
 }
 
-// const single = getOneEpisode();
-// createEpisode(single);
+fetch(url)
+  .then((response) => response.json())
+  .then((data) => {
+    fillDropList(data);
+    showAllepisodes(data);
+    console.log(data);
+  })
+  .catch((error) => console.log(error));
 
-const allEpisodes = getAllEpisodes();
-allEpisodes.forEach((episode) => displayEpisode(episode));
-fillDropList(allEpisodes);
+// console.log(allEpisodes);
+//const allEpisodes = getAllEpisodes();
+
+const showAllepisodes = (data) => {
+  data.forEach((episode) => displayEpisode(episode));
+};
+
+// fillDropList(allEpisodes);
 
 searchField = document.querySelector("#search-field");
-searchField.addEventListener("keyup", searchEpisode);
+searchField.addEventListener("input", searchEpisode);
 
 function ShowCount(resultCounter, allCounter) {
   result = document.querySelector("#search-count");
@@ -86,6 +100,8 @@ function fillDropList(episodes) {
     option.value = item.id;
     episodeList.add(option);
   });
+  allEpisodes = [...episodes];
+  console.log(allEpisodes, "--------data");
 }
 
 document
