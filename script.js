@@ -12,6 +12,7 @@
 // window.onload = setup;
 
 const url = "https://api.tvmaze.com/shows/82/episodes";
+const showsUrl = "https://api.tvmaze.com/shows";
 let allEpisodes = [];
 
 function getEpisodeName(singleEpisode) {
@@ -45,6 +46,18 @@ function displayEpisode(singleEpisode) {
   article.className = "episode";
 }
 
+//fetch Shows data
+
+fetch(showsUrl)
+  .then((response) => response.json())
+  .then((data) => {
+    fillShowsList(data);
+    showAllepisodes(data);
+    console.log(data);
+  })
+  .catch((error) => console.log(error));
+
+// fetch Episiods data
 fetch(url)
   .then((response) => response.json())
   .then((data) => {
@@ -90,6 +103,18 @@ function searchEpisode(e) {
 
   searchResult.forEach((filtered) => displayEpisode(filtered));
   ShowCount(searchResult.length, allEpisodes.length);
+}
+
+function fillShowsList(shows) {
+  let showList = document.querySelector("#showsDropList");
+  shows.forEach((item) => {
+    let option = document.createElement("option");
+    option.text = item.name;
+    option.value = item.id;
+    showList.add(option);
+  });
+  allShows = [...shows];
+  console.log(allShows, "--------All SHOWS data");
 }
 
 function fillDropList(episodes) {
