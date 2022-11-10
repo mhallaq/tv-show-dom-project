@@ -1,20 +1,36 @@
 //You can edit ALL of the code here
-// function setup() {
-//   const allEpisodes = getAllEpisodes();
-//   makePageForEpisodes(allEpisodes);
-// }
+function setup() {
+  //fetch Shows data
+  let showList = document.querySelector("#showsDropList");
+  const episodeList = document.querySelector("#episodesDropList");
+  episodeList.innerText = "Select an Episode";
+  console.log(showList);
+  fetch(showsUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      fillShowsList(data);
+      showAllepisodes(data);
+      showList.addEventListener("change", displayEpisodes);
+      console.log(data, "-----------> All Shows <--------");
+    })
+    .catch((error) => console.log(error));
+}
 
 // function makePageForEpisodes(episodeList) {
 //   const rootElem = document.getElementById("root");
 //   // rootElem.textContent = `Got ${episodeList.length} episode(s)`;
 // }
 
-// window.onload = setup;
+window.onload = setup;
 
-const url = "https://api.tvmaze.com/shows/82/episodes";
+const url = `https://api.tvmaze.com/shows/showId/episodes`;
 const showsUrl = "https://api.tvmaze.com/shows";
 let allEpisodes = [];
 
+const clearEpisodes = () => {
+  let main = document.querySelector(".all-episodes");
+  main.innerHTML = "";
+};
 function getEpisodeName(singleEpisode) {
   return `${singleEpisode.name} - ${
     singleEpisode.season < 10
@@ -46,26 +62,27 @@ function displayEpisode(singleEpisode) {
   article.className = "episode";
 }
 
-//fetch Shows data
-
-fetch(showsUrl)
-  .then((response) => response.json())
-  .then((data) => {
-    fillShowsList(data);
-    showAllepisodes(data);
-    console.log(data);
-  })
-  .catch((error) => console.log(error));
-
 // fetch Episiods data
-fetch(url)
-  .then((response) => response.json())
-  .then((data) => {
-    fillDropList(data);
-    showAllepisodes(data);
-    console.log(data);
-  })
-  .catch((error) => console.log(error));
+
+const displayEpisodes = (e) => {
+  console.log(e.target.value);
+  const showId = e.target.value;
+  clearEpisodes();
+  if (showId == 0) {
+    setup();
+  } else {
+    episodesUrl = url.replace("showId", showId);
+    console.log(episodesUrl);
+    fetch(episodesUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        fillDropList(data);
+        showAllepisodes(data);
+        console.log(data, "-----------> All Episoids <--------");
+      })
+      .catch((error) => console.log(error));
+  }
+};
 
 // console.log(allEpisodes);
 //const allEpisodes = getAllEpisodes();
@@ -118,7 +135,13 @@ function fillShowsList(shows) {
 }
 
 function fillDropList(episodes) {
-  let episodeList = document.querySelector("#episodesDropList");
+  const episodeList = document.querySelector("#episodesDropList");
+  episodeList.innerHTML = "";
+  let option = document.createElement("option");
+  option.text = "Select an Episode";
+  option.value = 0;
+  episodeList.add(option);
+
   episodes.forEach((item) => {
     let option = document.createElement("option");
     option.text = getEpisodeName(item);
@@ -140,8 +163,7 @@ function selectSingleEpisode(e) {
     let singleResult = allEpisodes.filter(
       (episode) => episode.id == e.target.value
     );
-    let main = document.querySelector(".all-episodes");
-    main.innerHTML = "";
+    clearEpisodes();
     displayEpisode(singleResult[0]);
   }
 }
